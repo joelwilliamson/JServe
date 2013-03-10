@@ -1,0 +1,4 @@
+[Project]
+Name=JServe
+Manager=KDevCMakeManager
+VersionControl=kdevgit
