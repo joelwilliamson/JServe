@@ -1,10 +1,13 @@
 #include "configuration.h"
+#include "logger.hpp"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 static char** config_list;
+
+extern Log main_log;
 
 /*
  * All configuration options will be stored in a list similiar to argv.
@@ -14,35 +17,47 @@ int read_config()
 {
   int array_length = 4;
   int used = 0;
-  config_list = malloc((array_length+1)*(sizeof(char*)));
+  config_list = new char* [array_length+1];
   FILE* fd = fopen(CONFIG_FILE,"r");
   char line[256];
   char *key, *val;
   while(fgets(line,255,fd)) {
     if (line[0]=='#' || line[0] == '\n')
       continue;
-    printf("Read line: %s\n",line);
-    sscanf(line,"%ms = %ms",&key,&val);
+    main_log(std::string("Read line: ") + line,DEBUG);
+    sscanf(line,"%ms = %ms\n",&key,&val);
     if (used==array_length) {
       /* Grow the array */
       array_length*=2;
       char** old_list = config_list;
-      config_list = malloc((array_length+1)*sizeof(char*));
+      config_list = new char* [array_length+1];
       memmove(config_list,old_list,used*sizeof(char*));
       free(old_list);
     }
-    printf("key: %s\t",key);
+    main_log(std::string("key: ") + key);
     config_list[used++]=key;
-    printf("val: %s\t",val);
+    main_log(std::string("val: ") +val);
     config_list[used++]=val;
   }
   config_list[used]=NULL;
+  fclose(fd);
   return 0;
 }
 
-char* get_config(char* var_name)
+const std::string get_config(const std::string &var_name)
 {
   int idx = 0;
-  while (strcmp(var_name,config_list[idx])) idx+=2;
-  return config_list[idx+1];
+  while (strcmp(var_name.c_str(),config_list[idx])) idx+=2;
+  return std::string(config_list[idx+1]);
+}
+
+void delete_config()
+{
+	char **next = config_list;
+	do {
+		main_log(std::string("Freeing string ") + *next + " at " + std::to_string((long long int)next));
+		free(*next);
+		next++;
+	} while (*next);
+	free(config_list);
 }

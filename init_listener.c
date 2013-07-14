@@ -11,8 +11,11 @@
 
 #include "init_listener.h"
 #include "configuration.h"
+#include "logger.hpp"
 
 int backlog = 100;
+static int listen_socket;
+extern Log main_log;
 
 int init_listener()
 {
@@ -20,7 +23,7 @@ int init_listener()
   struct addrinfo hints, *result, *rp;
   
   int port;
-  sscanf(get_config("port"),"%d",&port);
+  sscanf(get_config("port").c_str(),"%d",&port);
   
   memset(&hints,0,sizeof(struct addrinfo));
   hints.ai_socktype = SOCK_STREAM;
@@ -37,14 +40,14 @@ int init_listener()
     if ((sock_fd=socket(rp->ai_family,rp->ai_socktype,0))==-1)
       continue;
     
-    printf("Created socket...\n");
+    main_log("Created socket...",NOTICE);
     
     if (bind(sock_fd,rp->ai_addr,rp->ai_addrlen) == 0)
     {
-      printf("Bound socket on to address %s...\n",rp->ai_addr->sa_data);
+      main_log("Bound socket on to address " + std::to_string((long long int)rp->ai_addr->sa_data),DEBUG);;
       break;
     } else {
-      printf("Failed to bind socket.\n");
+      main_log("Failed to bind socket.",WARNING);
     }
     
     close(sock_fd);
@@ -53,8 +56,15 @@ int init_listener()
   if (listen(sock_fd, backlog) == -1)
     error(1,errno,"Error listening on socket. See %s, line %d.", __FILE__, __LINE__);
   
-  printf("Initted listener on port %d with fd %d.\n",port,sock_fd);
+  main_log("Initted listener on port " + std::to_string(port) + " with fd " + std::to_string(sock_fd) + ".",DEBUG);
       
   freeaddrinfo(result);
+  listen_socket = sock_fd;
   return sock_fd;
+}
+
+void close_listener ()
+{
+	main_log("Closing listening socket...", DEBUG);
+	close(listen_socket);
 }

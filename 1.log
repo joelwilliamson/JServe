@@ -1,0 +1,312 @@
+Read line: port = 8080
+
+key: port
+val: 8080
+Read line: root_dir = ./www
+
+key: root_dir
+val: ./www
+Read line: backend_plugin_dir = ./backend_plugins
+
+key: backend_plugin_dir
+val: ./backend_plugins
+Getting backend plugins from./backend_plugins
+Considering ./backend_plugins/. as a plugin.
+Considering ./backend_plugins/.. as a plugin.
+Considering ./backend_plugins/api.c as a plugin.
+Considering ./backend_plugins/no_extension_backend.cpp as a plugin.
+Considering ./backend_plugins/plugin_types.h as a plugin.
+Considering ./backend_plugins/default_backend.cpp as a plugin.
+Considering ./backend_plugins/default_backend.so as a plugin.
+./backend_plugins/default_backend.so seems to be a plugin. Linking...
+Opened plugin ./backend_plugins/default_backend.so for linking.
+Cleared the error buffer. Trying to link...
+
+Link complete. Checking status...
+Status is 
+Got the 'register_backend' symbol.
+Attempting to register backends...
+Got backend list.
+Added handler with extension deault to list.
+Finished getting backends.
+Created socket...
+Bound socket on to address 36923042
+Initted listener on port 8080 with fd 4.
+Ready to listen on fd 4
+Spawning handler...
+Execution resumed in main event loop.
+Reading request...
+Read Client Request:GET /index.html HTTP/1.1
+Host: 10.0.1.118:8080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:25.0) Gecko/20130713 Firefox/25.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+
+
+Method: GET
+Request URI: /index.html
+HTTP Version: HTTP/1.1
+
+Finished reading request.
+Attempting to get response from ./www//index.html
+Using extension: .html
+Using handler with extension deault
+Sent Message:
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 233
+Connection: close
+
+<html>
+<head>
+<!--<link rel="shortcut icon" href="10.0.1.113:5432/favicon.ico" />-->
+<title>This is an HTML file</title>
+</head>
+
+<body>
+This is the body of an <b>HTML</b> file.
+<a href=second.html>This is a link</a>
+</body>
+</html>
+
+Spawning handler...
+Execution resumed in main event loop.
+Reading request...
+Read Client Request:GET /second.html HTTP/1.1
+Host: 10.0.1.118:8080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:25.0) Gecko/20130713 Firefox/25.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.0.1.118:8080/index.html
+Connection: keep-alive
+
+
+Method: GET
+Request URI: /second.html
+HTTP Version: HTTP/1.1
+
+Finished reading request.
+Attempting to get response from ./www//second.html
+Using extension: .html
+Using handler with extension deault
+Sent Message:
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 142
+Connection: close
+
+<html>
+<head>
+<title>A Second Page</title>
+</head>
+
+<body>
+<h2>A Linked Page</h2><br>
+Maybe you followed a link to this page.
+</body>
+</html>
+
+Spawning handler...
+Execution resumed in main event loop.
+Reading request...
+Read Client Request:GET /index.html HTTP/1.1
+Host: 10.0.1.118:8080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:25.0) Gecko/20130713 Firefox/25.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Cache-Control: max-age=0
+
+
+Method: GET
+Request URI: /index.html
+HTTP Version: HTTP/1.1
+
+Finished reading request.
+Attempting to get response from ./www//index.html
+Using extension: .html
+Using handler with extension deault
+Sent Message:
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 233
+Connection: close
+
+<html>
+<head>
+<!--<link rel="shortcut icon" href="10.0.1.113:5432/favicon.ico" />-->
+<title>This is an HTML file</title>
+</head>
+
+<body>
+This is the body of an <b>HTML</b> file.
+<a href=second.html>This is a link</a>
+</body>
+</html>
+
+Spawning handler...
+Execution resumed in main event loop.
+Reading request...
+Read Client Request:GET /second.html HTTP/1.1
+Host: 10.0.1.118:8080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:25.0) Gecko/20130713 Firefox/25.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.0.1.118:8080/index.html
+Connection: keep-alive
+
+
+Method: GET
+Request URI: /second.html
+HTTP Version: HTTP/1.1
+
+Finished reading request.
+Attempting to get response from ./www//second.html
+Using extension: .html
+Using handler with extension deault
+Sent Message:
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 142
+Connection: close
+
+<html>
+<head>
+<title>A Second Page</title>
+</head>
+
+<body>
+<h2>A Linked Page</h2><br>
+Maybe you followed a link to this page.
+</body>
+</html>
+
+Spawning handler...
+Execution resumed in main event loop.
+Reading request...
+Read Client Request:GET /second.html HTTP/1.1
+Host: 10.0.1.118:8080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:25.0) Gecko/20130713 Firefox/25.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.0.1.118:8080/index.html
+Connection: keep-alive
+Cache-Control: max-age=0
+
+
+Method: GET
+Request URI: /second.html
+HTTP Version: HTTP/1.1
+
+Finished reading request.
+Attempting to get response from ./www//second.html
+Using extension: .html
+Using handler with extension deault
+Sent Message:
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 142
+Connection: close
+
+<html>
+<head>
+<title>A Second Page</title>
+</head>
+
+<body>
+<h2>A Linked Page</h2><br>
+Maybe you followed a link to this page.
+</body>
+</html>
+
+Spawning handler...
+Execution resumed in main event loop.
+Execution resumed in main event loop.
+Reading request...
+Read Client Request:GET /index.html HTTP/1.1
+Host: 10.0.1.118:8080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:25.0) Gecko/20130713 Firefox/25.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Cache-Control: max-age=0
+
+
+Method: GET
+Request URI: /index.html
+HTTP Version: HTTP/1.1
+
+Finished reading request.
+Attempting to get response from ./www//index.html
+Using extension: .html
+Using handler with extension deault
+Sent Message:
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 233
+Connection: close
+
+<html>
+<head>
+<!--<link rel="shortcut icon" href="10.0.1.113:5432/favicon.ico" />-->
+<title>This is an HTML file</title>
+</head>
+
+<body>
+This is the body of an <b>HTML</b> file.
+<a href=second.html>This is a link</a>
+</body>
+</html>
+
+Spawning handler...
+Execution resumed in main event loop.
+Reading request...
+Read Client Request:GET /second.html HTTP/1.1
+Host: 10.0.1.118:8080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:25.0) Gecko/20130713 Firefox/25.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate
+Referer: http://10.0.1.118:8080/index.html
+Connection: keep-alive
+
+
+Method: GET
+Request URI: /second.html
+HTTP Version: HTTP/1.1
+
+Finished reading request.
+Attempting to get response from ./www//second.html
+Using extension: .html
+Using handler with extension deault
+Sent Message:
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 142
+Connection: close
+
+<html>
+<head>
+<title>A Second Page</title>
+</head>
+
+<body>
+<h2>A Linked Page</h2><br>
+Maybe you followed a link to this page.
+</body>
+</html>
+
+Closing listening socket...
+Freeing string port at 36923424
+Freeing string 8080 at 36923432
+Freeing string root_dir at 36923440
+Freeing string ./www at 36923448
+Freeing string backend_plugin_dir at 36923456
+Freeing string ./backend_plugins at 36923464
