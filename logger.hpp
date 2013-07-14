@@ -32,7 +32,8 @@ void close_log();
 class Log
 {
 	std::ofstream logFile;
-	Log_Level current_level;
+	Log_Level verbosity;
+	Log_Level current_priority;
 
 public:
 	Log(const std::string &filename, Log_Level verbosity = NOTICE);
@@ -41,6 +42,12 @@ public:
 	 * priority
 	 */
 	void operator()(const std::string &message, const Log_Level priority = DEBUG);
+	Log& operator<<(const std::string &message);
+	Log& operator<<(const char message[]);
+	Log& operator<<(const int message);
+	Log& operator<<(const Log_Level new_priority);
+	
+	Log_Level get_priority();
 };
 
 #endif
