@@ -1,7 +1,7 @@
 CXX = g++
-CXXFLAGS += -Wall -MMD -std=c++11
+CXXFLAGS += -Wall -MMD -std=c++11 -DCONFIG_FILE='"jserve.conf"' -fpic
 EXEC = jserve
-LIBS = -ldl
+LIBS = -ldl -pthread
 OBJECTS = backend_manager.o configuration.o handler.o request.o init_listener.o logger.o main.o
 DEPENDS = ${OBJECTS:.o=.d}
 
