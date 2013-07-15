@@ -17,23 +17,27 @@ extern Log main_log;
  * All configuration options will be stored in a list similiar to argv.
  * The list will be successive key-value pairs. Eg char**l = {k1,l1,k2,l2,0};
  */
-int read_config()
-{
-	std::ifstream config(CONFIG_FILE);
+int read_config() {
+	std::ifstream config ( CONFIG_FILE );
 	main_log << INFO << "Opened file " << CONFIG_FILE << " for configuration.\n";
 	std::string key, value;
 	std::string seperator;
-	while (config) {
-		while (config.peek() == '#') config.ignore(std::numeric_limits< int >::max(),'\n');
+	std::string ignored_line;
+	while ( config ) {
+		while ( config.peek() == '#' || config.peek() == '\n' ) {
+			std::getline ( config,ignored_line );
+			main_log << DEBUG << "Ignored: " << ignored_line << "\n";
+			goto next_line;
+			}
 		config >> key >> seperator >> value;
 		main_log << DEBUG << key << " = " << value << "\n";
 		config_list[key] = value;
-	}
-	
-	return 0;
-}
+next_line:;
+		}
 
-const std::string get_config(const std::string &var_name)
-{
+	return 0;
+	}
+
+const std::string get_config ( const std::string &var_name ) {
 	return config_list[var_name];
-}
+	}

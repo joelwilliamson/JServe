@@ -10,10 +10,7 @@ class Handler
 	{
 	int file_descriptor; //The socket this handler is attached to.
 	size_t client_request_size;
-	/* Does the actual work of handling the client. This allows spawn_handler to
-	 * create a new thread and immediately return.
-	 */
-	void worker();
+	
 	/* Send the buffer data to the socket fd.
 	 * Return 0 on success, non-zero on failure.
 	 */
@@ -21,6 +18,10 @@ class Handler
 	
 public:
 	Handler(int file_descriptor);
+	/* Does the actual work of handling the client. This allows spawn_handler to
+	* create a new thread and immediately return.
+	*/
+	void worker();
 	};
 	
 #endif

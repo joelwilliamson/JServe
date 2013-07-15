@@ -73,7 +73,7 @@ int register_backend_plugins()
 			{
 			continue;
 			}
-		main_log ( filepath + " seems to be a plugin. Linking..." );
+		main_log << DEBUG << filepath << " seems to be a plugin. Linking...\n" ;
 		handle = dlopen ( filepath.c_str(),RTLD_NOW );
 		if ( !handle )
 			{
@@ -82,7 +82,8 @@ int register_backend_plugins()
 			}
 		else
 			{
-			main_log ( "Opened plugin " + filepath + " for linking.", DEBUG );
+			main_log << DEBUG << "Opened plugin " << filepath
+				<< " for linking.\n";
 			}
 
 		std::list<backend_t> ( *register_backend ) ();

@@ -15,7 +15,7 @@ Request::Request ( int file_descriptor )
 	 * takes mutable C-strings as arguments.
 	 */
 	char* client_request = new char [client_request_size+1];
-	size_t amount_read;
+	ssize_t amount_read;
 
 	/* Get the request from the socket */
 	if ( ( amount_read = read ( file_descriptor,client_request,client_request_size ) ) == -1 )

@@ -1,5 +1,7 @@
 #include <cstdio>
 #include <cstdarg>
+#include <ctime>
+#include <chrono>
 
 #include "logger.hpp"
 
@@ -25,22 +27,26 @@ void close_log()
 Log::Log ( const std::string& filename, Log_Level verbosity )
 	: verbosity ( verbosity )
 	{
-	logFile.open ( filename.c_str() );
+	using std::chrono::system_clock;
+	logFile.open ( filename.c_str(), std::ios::app | std::ios::out);
+	time_t tt = system_clock::to_time_t(system_clock::now());
+	logFile << "Opened at: " << ctime(&tt) <<std::endl;
 	}
 
 Log::~Log()
 	{
+	using std::chrono::system_clock;
+	time_t tt = system_clock::to_time_t(system_clock::now());
+	logFile << "Closed at: " << ctime(&tt);
+	logFile.flush();
 	logFile.close();
 	}
 
-void Log::operator() ( const std::string& message, const Log_Level priority )
-	{
-	if ( priority <= verbosity )
-		{
-		logFile << message;
+void Log::operator() ( const std::string& message, const Log_Level priority ) {
+	if ( priority <= verbosity ) {
+		logFile << message << std::endl;
 		logFile.flush();
 		}
-		return *this;
 	}
 
 Log& Log::operator<< ( const std::string& message )
@@ -63,7 +69,7 @@ Log& Log::operator<< ( const char message[] )
 	return *this;
 	}
 
-Log& Log::operator<< ( const int message )
+Log& Log::operator<< ( const long long int message )
 	{
 	if ( current_priority <= verbosity )
 		{

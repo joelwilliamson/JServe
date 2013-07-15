@@ -1,6 +1,6 @@
 #include "handler.hpp"
 
-#include "configuration.h"
+#include "configuration.hpp"
 #include "backend_manager.hpp"
 #include "logger.hpp"
 #include "request.hpp"
@@ -14,6 +14,8 @@
 #include <string>
 #include <sstream>
 #include <memory>
+#include <cerrno>
+#include <cstring>
 
 extern Log main_log;
 
@@ -63,10 +65,12 @@ int Handler::send_data ( const std::string &data )
 		<< "\r\n"
 		<< data;
 
-	write ( file_descriptor,response.str().c_str(), response.gcount() );
-	main_log ( "Sent Message:",DEBUG );
-	main_log ( response.str(),DEBUG );
-	free ( response );
+	main_log << DEBUG << "Attempting to send: " << response.str().c_str();
+	size_t bytes_written = write ( file_descriptor,response.str().c_str(), response.str().size() );
+	if (!bytes_written) {
+		main_log << NOTICE << "Failed to write: " << strerror(errno) << "\n";
+		return 1;
+	}
 	return 0;
 	}
 
@@ -86,10 +90,18 @@ void Handler::worker()
 		}
 
 	std::string file_path ( get_config ( "root_dir" ) );
+	main_log << DEBUG << "Using " << file_path << " as the URI root, and "
+		<< req->URI << " as the tail.\n";
 	file_path=file_path + "/" + req->URI;
 
 	int error_code;
-	std::string response_body = get_resource ( file_path,NULL,error_code );
+	std::string response_body;
+	try {
+		response_body = get_resource ( file_path,NULL,error_code );
+		}
+	catch ( int e ) {
+		server_error ( file_descriptor,e );
+		}
 
 	if ( !response_body.size() )
 		{
@@ -110,13 +122,9 @@ Handler::Handler ( int file_descriptor )
 	{
 	}
 
-std::unique_ptr<Handler> make_handler(int fd)
-{
-	return std::unique_ptr<Handler>(new Handler(fd));
-}
 
 void spawn_handler(int fd)
 {
-	std::thread t(make_handler,fd);
+	std::thread t(&Handler::worker,Handler(fd));
 	t.detach();
 }

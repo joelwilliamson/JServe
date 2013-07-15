@@ -44,7 +44,7 @@ public:
 	void operator()(const std::string &message, const Log_Level priority = DEBUG);
 	Log& operator<<(const std::string &message);
 	Log& operator<<(const char message[]);
-	Log& operator<<(const int message);
+	Log& operator<<(const long long int message);
 	Log& operator<<(const Log_Level new_priority);
 	
 	Log_Level get_priority();
