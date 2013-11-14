@@ -124,21 +124,17 @@ int send_data(int fd, const char* data)
 /* Does the actual work of handling the client. This allows spawn_handler to
  * create a new thread and immediately return.
  */
-void* handler(void* arg)
-{
-	int fd = *(int*)arg;
-	free(arg);
+void handler(int fd)
+	{
 	Request *req;
 	
-	main_log("Reading request...",DEBUG);
+	main_log << DEBUG << "Reading request...";
 	req = read_request(fd);
 	
 	if (!req) {
-		main_log("Server error occured. Ending handler...",WARNING);
-		return nullptr;
-	} else {
-		main_log("Finished reading request.",DEBUG);
-	}
+		main_log << WARNING << "Server error occured. Ending handler...";
+		return;
+	} else main_log << DEBUG <<"Finished reading request.";
   
   
   
@@ -149,27 +145,21 @@ void* handler(void* arg)
 	std::string response_body = get_resource(file_path,NULL,error_code);
 	
 	if (!response_body.size()) {
-		main_log("Server error occurred. Ending handler...\n",ERROR);
-		return NULL;
+		main_log << ERROR << "Server error occurred. Ending handler...\n";
+		return;
+		}
+  
+	if (send_data(fd,response_body.c_str())) {
+		main_log << WARNING << "Server error occured. Ending handler...\n";
+		return;
+		}
+  
+	delete req;
+	return;
 	}
-  
-  if (send_data(fd,response_body.c_str())) {
-    main_log("Server error occured. Ending handler...\n",WARNING);
-    return nullptr;
-  }
-  
-  delete req;
-  return nullptr;
-}
 
 
 int spawn_handler(int fd)
-{
-  pthread_t t;
-  int *fd_p = new int;
-  *fd_p = fd;
-  pthread_attr_t attr;
-  pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
-  pthread_create(&t,NULL,handler,fd_p);
-  return 0;
-}
+	{
+	std::thread(handler,fd).detach();
+	}
