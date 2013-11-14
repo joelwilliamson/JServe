@@ -27,9 +27,10 @@ std::string provide_resource(const std::string &path, struct client_t* client, i
 {
 	struct stat statbuf;
 	if (stat(path.c_str(),&statbuf)==-1) {
-		main_log("Couldn't find file " + path + " " + strerror(errno));
+		main_log << "Couldn't find file " << path << ": " << strerror(errno) << "\n";
 		error_code = 404;
-		return nullptr;
+		throw error_code;
+		return std::string();
 	}
 	off_t file_size = statbuf.st_size;
   
@@ -39,6 +40,7 @@ std::string provide_resource(const std::string &path, struct client_t* client, i
 	if ((rf = open(path.c_str(),O_RDONLY)) == -1) {
 		main_log("File " + path + " failed to open by plugin " __FILE__ + ": " + strerror(errno) + "\n");
 		error_code = 503;
+		throw error_code;
 		return nullptr;
 	}
   
@@ -46,6 +48,7 @@ std::string provide_resource(const std::string &path, struct client_t* client, i
 	if ((bytes_read = read(rf,response_body,file_size)) == -1) {
 		main_log("Error reading file " + path + " in plugin " + __FILE__ + ": " + strerror(errno) + "\n");
 		error_code = 503;
+		throw error_code;
 		return nullptr;
 	} else {
 		response_body[bytes_read]='\0';
