@@ -24,5 +24,15 @@ Configured Launchers=scriptAppLauncher
 Name=New Script Application Launcher
 Type=Script Application
 
+[Launch][Launch Configuration 0][Data]
+Arguments=
+EnvironmentGroup=default
+Executable=file:///home/joel/projects/JServe/launcher.sh
+Execute on Remote Host=false
+Interpreter=/bin/sh
+Output Filtering Mode=0
+Remote Host=
+Working Directory=file:///home/joel/projects/JServe/
+
 [Project]
 VersionControlSupport=kdevgit
