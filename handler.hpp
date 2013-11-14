@@ -21,7 +21,7 @@ public:
 	/* Does the actual work of handling the client. This allows spawn_handler to
 	* create a new thread and immediately return.
 	*/
-	void worker();
+	void operator()();
 	};
 	
 #endif
