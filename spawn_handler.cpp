@@ -1,6 +1,6 @@
 #include "spawn_handler.hpp"
 
-#include "configuration.h"
+#include "configuration.hpp"
 #include "backend_manager.hpp"
 #include "logger.hpp"
 
@@ -18,6 +18,7 @@
 
 #include <string>
 #include <sstream>
+#include <thread>
 
 
 /* The maximum allowed size for client requests. This is small enough that it
@@ -31,7 +32,7 @@ struct Request {
   std::string method;
   std::string URI;
   std::string http_version;
-  std::string raw;
+  std::unique_ptr<char[]> raw;
 };
 
 
@@ -61,38 +62,39 @@ static int server_error(int client_fd, int err_code)
 }
 
 /* Read the request from the socket, returning in a nice binary format.
- * The caller is reponsible for freeing the heap allocated return structure.
- * If something goes wrong, a null pointer is returned.
+ * The return value should be subject to NRVO, so it will be fast
  */
-static Request *read_request(int fd)
+static Request read_request(int fd)
 {
-	Request *retval = new Request;
+	Request retval;
 
-	char * client_request = new char[client_request_size+1];
+	std::unique_ptr<char[]> client_request(new char[client_request_size+1]);
 	int amount_read;
 	/* Get the request from the socket. */
-	if ((amount_read = read(fd,client_request,client_request_size))==-1) {
+	if ((amount_read = read(fd,client_request.get(),client_request_size))==-1) {
 		server_error(fd,500);
-		return NULL;
+		throw; // TODO: choose a good exception to throw
 	} else {
 		client_request[amount_read]=0; // Make sure we have a valid C string
 	}
-	main_log(std::string("Read Client Request:") + client_request,DEBUG);
+	main_log << DEBUG << "Read Client Request:" << client_request.get();
 	
 	/* Parse the request header */
-	std::stringstream request_stream(client_request);
-	request_stream >> retval->method;
-	request_stream >> retval->request_uri;
-	request_stream >> retval->http_version;
+	std::stringstream request_stream(client_request.get());;
+	request_stream >> retval.method;
+	request_stream >> retval.URI;
+	request_stream >> retval.http_version;
 	if (request_stream.fail()) {
-		main_log(std::string("Received a bad request:\n")+client_request,WARNING);
+		main_log << WARNING << "Received a bad request:\n" << client_request.get();
 		server_error(fd,400);
-		return NULL;
+		throw; // TODO: throw a proper exception
 	} else {
-		main_log("Method: " + retval->method + "\nRequest URI: " + retval->request_uri + "\nHTTP Version: " + retval->http_version + "\n");
+		main_log << DEBUG << "Method: " << retval.method << '\n';
+		main_log << "Request URI: " << retval.URI << '\n';
+		main_log << "HTTP Version: " << retval.http_version << '\n';
 	}
 	
-	retval->request_data = client_request;
+	std::swap(retval.raw,client_request);
 	
 	return retval;
 }
@@ -126,20 +128,17 @@ static int send_data(int fd, const char* data)
  */
 static void handler(int fd)
 	{
-	Request *req;
+	Request req;
 	
 	main_log << DEBUG << "Reading request...";
 	req = read_request(fd);
 	
-	if (!req) {
-		main_log << WARNING << "Server error occured. Ending handler...";
-		return;
-	} else main_log << DEBUG <<"Finished reading request.";
+	main_log << DEBUG <<"Finished reading request.";
   
   
   
 	std::string file_path(get_config("root_dir"));
-	file_path=file_path + "/" + req->request_uri;
+	file_path=file_path + "/" + req.URI;
 	
 	int error_code;
 	std::string response_body = get_resource(file_path,NULL,error_code);
@@ -154,7 +153,6 @@ static void handler(int fd)
 		return;
 		}
   
-	delete req;
 	return;
 	}
 
@@ -162,4 +160,5 @@ static void handler(int fd)
 int spawn_handler(int fd)
 	{
 	std::thread(handler,fd).detach();
+	return 0;
 	}
