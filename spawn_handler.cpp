@@ -1,3 +1,5 @@
+// DEPRECATED
+// This functionality now resides in handler.{h,c}pp
 #include "spawn_handler.hpp"
 
 #include "configuration.hpp"
