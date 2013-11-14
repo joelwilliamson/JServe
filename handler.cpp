@@ -77,14 +77,14 @@ int Handler::send_data ( const std::string &data )
 /* Does the actual work of handling the client. This allows spawn_handler to
  * create a new thread and immediately return.
  */
-void Handler::worker()
+void Handler::operator()()
 	{
 		
-	main_log ( "Reading request...",DEBUG );
+	main_log << DEBUG << "Reading request...";
 	std::unique_ptr<Request> req;
 	try { req  = std::unique_ptr<Request> (new Request(file_descriptor)); }
 	catch (int error_number) {
-		main_log ( "Server error occured. Ending handler...",WARNING );
+		main_log << WARNING << "Error reading request. Ending handler...";
 		server_error(file_descriptor,error_number);
 		return;
 		}
@@ -105,13 +105,13 @@ void Handler::worker()
 
 	if ( !response_body.size() )
 		{
-		main_log ( "Server error occurred. Ending handler...\n",ERROR );
+		main_log ( "Empty response body. Ending handler...\n",ERROR );
 		return;
 		}
 
 	if ( send_data (response_body ) )
 		{
-		main_log ( "Server error occured. Ending handler...\n",WARNING );
+		main_log ( "Error sending data. Ending handler...\n",WARNING );
 		return;
 		}
 
@@ -125,6 +125,5 @@ Handler::Handler ( int file_descriptor )
 
 void spawn_handler(int fd)
 {
-	std::thread t(&Handler::worker,Handler(fd));
-	t.detach();
+	std::thread(Handler(fd)).detach();
 }
