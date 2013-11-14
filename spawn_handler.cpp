@@ -36,7 +36,7 @@ struct Request {
 
 
 /* The server has encountered an error. Let the client know and add it to the logs. */
-int server_error(int client_fd, int err_code)
+static int server_error(int client_fd, int err_code)
 {
 	char err_msg[32];
 	switch (err_code) {
@@ -64,7 +64,7 @@ int server_error(int client_fd, int err_code)
  * The caller is reponsible for freeing the heap allocated return structure.
  * If something goes wrong, a null pointer is returned.
  */
-Request *read_request(int fd)
+static Request *read_request(int fd)
 {
 	Request *retval = new Request;
 
@@ -101,7 +101,7 @@ Request *read_request(int fd)
 /* Send the buffer data to the socket fd.
  * Return 0 on success, non-zero on failure.
  */
-int send_data(int fd, const char* data)
+static int send_data(int fd, const char* data)
 {
 	int body_length = strlen(data);
 	
@@ -124,7 +124,7 @@ int send_data(int fd, const char* data)
 /* Does the actual work of handling the client. This allows spawn_handler to
  * create a new thread and immediately return.
  */
-void handler(int fd)
+static void handler(int fd)
 	{
 	Request *req;
 	
