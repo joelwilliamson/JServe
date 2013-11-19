@@ -73,7 +73,7 @@ int register_backend_plugins()
 			{
 			continue;
 			}
-		main_log << DEBUG << filepath << " seems to be a plugin. Linking...\n" ;
+		main_log << INFO << filepath << " seems to be a plugin. Linking...\n" ;
 		handle = dlopen ( filepath.c_str(),RTLD_NOW );
 		if ( !handle )
 			{
