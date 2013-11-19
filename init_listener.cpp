@@ -9,7 +9,9 @@
 
 extern Log main_log;
 
-Listener::Listener ( int backlog ) {
+static Socket openSocket()
+	{
+
 	addrinfo hints, *result, *rp;
 
 	/* The port to attempt binding to */
@@ -27,47 +29,40 @@ Listener::Listener ( int backlog ) {
 		}
 
 	for ( rp = result; rp ; rp = rp->ai_next ) {
-		if ( ( sock_fd = socket ( rp->ai_family,rp->ai_socktype,0 ) ) == -1 ) {
-			main_log << DEBUG << "Attempt to open socket failed...\n";
-			continue;
+		try {
+			Socket s(rp->ai_family,rp->ai_socktype,0); 
+	
+			main_log << DEBUG << "Created socket.\n";
+
+			SocketAddress sa;
+			sa.address = rp->ai_addr;
+			sa.length = rp->ai_addrlen;
+			try {
+				s.bind(sa);
+				main_log << DEBUG << "Bound socket onto address "
+				         << rp->ai_addr->sa_data << "\n";
+				freeaddrinfo(result); // Ideally this should be RAII
+				return s;
+				}
+			catch (int &e) {
+				main_log << DEBUG << "Attempt to bind to socket failed.\n";
+				main_log << DEBUG << strerror(errno) << "\n";
+				}
 			}
-
-		main_log << DEBUG << "Created socket.\n";
-
-		if ( bind ( sock_fd, rp->ai_addr,rp->ai_addrlen ) == 0 ) {
-			main_log << DEBUG << "Bound socket onto address "
-			         << rp->ai_addr->sa_data << "\n";
-			break;
-			}
-		else {
-			main_log << DEBUG << "Attempt to bind to socket failed.\n";
-			main_log << DEBUG << strerror(errno) << "\n";
-			}
-
-		close ( sock_fd ); /* The bind failed, so we need to release the
-				 * file descriptor for reopening.
-				 */
-
+		catch (int &e) {} // If an exception is thrown, we simply try again
 		}
-
-	if ( listen ( sock_fd, backlog ) == -1 ) {
-		main_log << ERROR << "Error listening on socket. See "
-		         << __FILE__ << ", line #" << __LINE__ << "\n";
-		main_log << ERROR << strerror(errno) << "\n";
-		throw 10;
-		}
-
-	main_log << INFO << "Initted listener on port " << port
-	         << "with fd " << sock_fd << "\n";
-
-	freeaddrinfo ( result );
+	freeaddrinfo(result);
+	throw; //TODO: better exception
 	}
 
-Listener::~Listener() {
-	close ( sock_fd );
-	main_log << DEBUG << "Closed listening socket.\n";
-	}
 
-int Listener::get_fd() const {
-	return sock_fd;
+Listener::Listener ( int backlog )
+	: Socket(openSocket())
+	{
+
+	listen(backlog);
+
+	main_log << INFO << "Initted listener on port " << get_config( "port" )
+	         << "with fd " << getfd() << "\n";
+
 	}
