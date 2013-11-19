@@ -1,3 +1,4 @@
+#pragma once
 #include "sockaddr.hpp"
 
 
@@ -21,4 +22,8 @@ public:
 	void listen(int backlog);
 	Socket accept(SocketAddress& sa);
 	void connect(const SocketAddress& sa);
+
+	int write(const void * buffer, ssize_t length);
+
+	int getfd() const;
 };
