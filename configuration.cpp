@@ -30,7 +30,7 @@ int read_config() {
 			goto next_line;
 			}
 		config >> key >> seperator >> value;
-		main_log << DEBUG << key << " = " << value << "\n";
+		main_log << INFO << key << " = " << value << "\n";
 		config_list[key] = value;
 next_line:;
 		}
