@@ -4,6 +4,7 @@
 #include "backend_manager.hpp"
 #include "logger.hpp"
 #include "request.hpp"
+#include "socket.hpp"
 
 #include <unistd.h>
 #include <error.h>
@@ -11,16 +12,17 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <string>
 #include <sstream>
 #include <memory>
 #include <cerrno>
 #include <cstring>
+#include <thread>
+#include <functional>
 
 extern Log main_log;
 
 /* The server has encountered an error. Let the client know and add it to the logs. */
-int server_error ( int client_fd, int err_code )
+int Handler::server_error ( int err_code )
 	{
 	std::string err_msg;
 	switch ( err_code )
@@ -46,7 +48,7 @@ int server_error ( int client_fd, int err_code )
 	               "Connection: close\r\n" +
 	               "\r\n" +
 	               response_body + "\r\n";
-	write ( client_fd,status_line.c_str(),status_line.size() );
+	socket.write ( status_line.c_str(),status_line.size() );
 	main_log ( "Sent:\n" + status_line );
 	return err_code;
 	}
@@ -66,7 +68,7 @@ int Handler::send_data ( const std::string &data )
 		<< data;
 
 	main_log << DEBUG << "Attempting to send: " << response.str().c_str();
-	size_t bytes_written = write ( file_descriptor,response.str().c_str(), response.str().size() );
+	size_t bytes_written = socket.write ( response.str().c_str(), response.str().size() );
 	if (!bytes_written) {
 		main_log << NOTICE << "Failed to write: " << strerror(errno) << "\n";
 		return 1;
@@ -82,10 +84,10 @@ void Handler::operator()()
 		
 	main_log << DEBUG << "Reading request...";
 	std::unique_ptr<Request> req;
-	try { req  = std::unique_ptr<Request> (new Request(file_descriptor)); }
+	try { req  = std::unique_ptr<Request> (new Request(socket.getfd())); }
 	catch (int error_number) {
 		main_log << WARNING << "Error reading request. Ending handler...";
-		server_error(file_descriptor,error_number);
+		server_error(error_number);
 		return;
 		}
 
@@ -100,7 +102,7 @@ void Handler::operator()()
 		response_body = get_resource ( file_path,NULL,error_code );
 		}
 	catch ( int e ) {
-		server_error ( file_descriptor,e );
+		server_error ( e );
 		}
 
 	if ( !response_body.size() )
@@ -117,13 +119,18 @@ void Handler::operator()()
 
 	}
 
-Handler::Handler ( int file_descriptor )
-	: file_descriptor ( file_descriptor ), client_request_size ( 1024 )
+Handler::Handler ( Socket&& s )
+	: socket(std::move(s))
 	{
 	}
 
+static void launch(std::unique_ptr<Socket> socket_ptr)
+	{
+	Handler{std::move(*socket_ptr)}();
+	}
 
-void spawn_handler(int fd)
+void spawn_handler(Socket&& s)
 {
-	std::thread(Handler(fd)).detach();
+	std::unique_ptr<Socket> socket_ptr(new Socket(std::move(s)));
+	std::thread{launch,std::move(socket_ptr)}.detach();
 }
