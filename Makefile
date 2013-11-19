@@ -11,6 +11,6 @@ ${EXEC}: ${OBJECTS}
 -include ${DEPENDS}
 
 clean:
-	rm ${OBJECTS} ${EXEC} ${DEPENDS}
+	rm ${OBJECTS} ${EXEC} ${DEPENDS} jserve.log
 
 .PHONY: clean
