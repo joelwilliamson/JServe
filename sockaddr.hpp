@@ -1,7 +1,7 @@
+#pragma once
 #include <sys/socket.h>
 
-class SocketAddress {
-public:
-	sockaddr address;
+struct SocketAddress {
+	sockaddr *address;
 	socklen_t length;
 };

@@ -42,7 +42,7 @@ Socket::~Socket()
 
 void Socket::bind(const SocketAddress& sa)
 	{
-	if (::bind(fd,&sa.address,sa.length)) {
+	if (::bind(fd,sa.address,sa.length)) {
 		main_log << ERROR << "Socket failed to bind: " << strerror(errno) << '\n';
 		throw errno; // TODO: better exception
 		}
@@ -58,7 +58,7 @@ void Socket::listen(int backlog)
 
 Socket Socket::accept(SocketAddress& sa)
 	{
-	int new_fd = ::accept(fd,&sa.address,&sa.length);
+	int new_fd = ::accept(fd,sa.address,&sa.length);
 	if (new_fd == -1) {
 		main_log << ERROR << "Failed to accept on socket: " << strerror(errno) << '\n';
 		throw errno; // TODO: etc
@@ -68,8 +68,18 @@ Socket Socket::accept(SocketAddress& sa)
 
 void Socket::connect(const SocketAddress& sa)
 	{
-	if (::connect(fd,&sa.address,sa.length)) {
+	if (::connect(fd,sa.address,sa.length)) {
 		main_log << ERROR << "Failed to connect to socket: " << strerror(errno) << '\n';
 		throw errno; // TODO: etc
 		}
+	}
+
+int Socket::getfd() const
+	{
+	return fd;
+	}
+
+int Socket::write(const void * buffer, ssize_t length)
+	{
+	return ::write(fd,buffer,length);
 	}
