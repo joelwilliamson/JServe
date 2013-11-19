@@ -3,9 +3,11 @@
 #include "handler.hpp"
 #include "init_listener.hpp"
 #include "logger.hpp"
+#include "sockaddr.hpp"
 
-#include <memory>
 #include <sys/socket.h>
+
+#include <utility>	// std::move
 
 int backlog = 100;
 Log main_log ( "jserve.log" ,DEBUG);
@@ -27,16 +29,18 @@ int main() {
 		exit ( 1 );
 		}
 	
-	std::unique_ptr<Listener> listener;
-	try { listener = std::unique_ptr<Listener>(new Listener(backlog));}
+	try {
+		Listener listener(backlog);
+		while (true) {
+			SocketAddress sa;
+			sa.address = NULL;
+			Socket s(listener.accept(sa));
+			spawn_handler(std::move(s));
+			}
+		}
 	catch (...)
 	{
 		exit(1);
-	}
-	
-	for (int new_sock_fd; 1+(new_sock_fd = accept(listener->get_fd(),NULL,NULL));)
-	{
-		spawn_handler(new_sock_fd);
-	}
+		}
 	
 }
