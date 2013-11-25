@@ -10,7 +10,7 @@
 #include <utility>	// std::move
 
 int backlog = 100;
-Log main_log ( "jserve.log" ,INFO);
+Log main_log ( "jserve.log" ,DEBUG);
 
 int main() {
 

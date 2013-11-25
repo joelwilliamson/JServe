@@ -136,7 +136,7 @@ success:
 std::string get_resource ( const std::string &path, struct client_t* client, int &error_code )
 	{
 	main_log ( "Attempting to get response from " + path, DEBUG );
-	std::string ext = strrchr ( path.c_str(),'.' );
+	std::string ext = strrchr ( path.c_str(),'.' ) + 1;
 	main_log ( "Using extension: " + ext,DEBUG );
 	if ( !ext.size() ) ext.erase ( 1 );
 	else ext = "";

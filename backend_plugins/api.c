@@ -13,7 +13,7 @@
  * extension. These are assumed to be plugins. The backend manager will link
  * with each of them, then call their register_backend() function.
  * 
- *    std::list<backend_t> register_backend();
+ *    extern "C" std::list<backend_t> register_backend();
  * 
  * This function will return a list of backends. This is a list of structs, each
  * with string matching an extension the backend handles, a uint representing
