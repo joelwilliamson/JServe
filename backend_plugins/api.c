@@ -13,29 +13,31 @@
  * extension. These are assumed to be plugins. The backend manager will link
  * with each of them, then call their register_backend() function.
  * 
- *    struct backend_t** register_backend();
+ *    std::list<backend_t> register_backend();
  * 
- * This function will return NULL if an error occurs, or return a list of
- * structs otherwise. This is a list of structs, each with string matching
- * an extension the backend handles and a uint representing the handler's
- * priority. A lower value for the priority will cause the handler to be
- * preferred over high values.
+ * This function will return a list of backends. This is a list of structs, each
+ * with string matching an extension the backend handles, a uint representing
+ * the handler's priority, a pointer to the function to be used to provide the
+ * resource and a pointer provided by dlopen(). A lower value for the priority
+ * will cause the handler to be preferred over high values.
  * 
  * 	struct backend_t {
- *		char* str;
- *		int priority;
+ *		std::string extension;
+ *		unsigned int priority;
+ *		provider_fn provider;
+ *		void * handle;
  *	}
  *
  * If the plugin has the lowest priority of any that register with a given
- * extension, its provide_resource() function will be called.
+ * extension, its provider() function will be called.
  * 
- *     char* provide_resource(char* path, struct client_t* client, int* error_code);
+ *     typedef  std::string (*provider_fn) (const std::string &path, struct client_t* client, int& error_code);
  * 
- * This function will return a dynamically allocated string that will be sent
- * as is to the client (or NULL on error). The path will be $root_dir/$requested_URI,
- * and client will contain information on the client. If an error occurs,
- * error_code will contain the HTTP error (400,404,503, etc.).
+ * This function will return a string that will be sent as is to the client.
+ * The path will be $root_dir/$requested_URI, and client will contain
+ * information on the client. If an error occurs, error_code will contain the
+ * HTTP error (400,404,503, etc.).
  * 
- * Since each request is handled in a separate thread (TODO: should this be
- * moved to a process?), it is necessary that plugins be thread-safe.
+ * Since each request is handled in a separate thread, it is necessary that
+ * plugins be thread-safe.
  */
